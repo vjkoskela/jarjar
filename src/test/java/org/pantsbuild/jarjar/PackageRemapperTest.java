@@ -16,7 +16,7 @@
 
 package org.pantsbuild.jarjar;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,10 @@ extends TestCase
         Rule rule = new Rule();
         rule.setPattern("org.**");
         rule.setResult("foo.@1");
-        remapper = new PackageRemapper(Collections.singletonList(rule), false);
+        Rule resourceRule = new Rule();
+        resourceRule.setPattern("META-INF.native.*");
+        resourceRule.setResult("META-INF/native/com_example_RESOURCE");
+        remapper = new PackageRemapper(Arrays.asList(rule, resourceRule), false);
     }
 
     @Test
@@ -56,9 +59,11 @@ extends TestCase
       assertEquals("foo/example/Object", remapper.mapValue("org/example/Object"));
       assertEquals("foo/example.Object", remapper.mapValue("org/example.Object")); // path match
 
-      assertEquals("foo.example.package-info", remapper.mapValue("org.example.package-info"));
-      assertEquals("foo/example/package-info", remapper.mapValue("org/example/package-info"));
-      assertEquals("foo/example.package-info", remapper.mapValue("org/example.package-info"));
+      assertUnchangedValue("foo.example.package-info");
+      assertUnchangedValue("foo/example/package-info");
+      assertUnchangedValue("foo/example.package-info");
+
+      assertEquals("META-INF/native/com_example_libnetty_tcnative.so", remapper.mapValue("META-INF/native/libnetty_tcnative.so"));
     }
 
     private void assertUnchangedValue(String value) {
