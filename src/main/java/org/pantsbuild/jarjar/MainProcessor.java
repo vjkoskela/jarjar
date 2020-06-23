@@ -81,6 +81,7 @@ class MainProcessor implements JarProcessor
         }));
         processors.add(new MethodSignatureProcessor(pr));
         processors.add(new ResourceProcessor(pr));
+        processors.add(new ServicesProcessor(pr));
         processors.add(new RenameProcessor(renameList));
         chain = new JarProcessorChain(processors.toArray(new JarProcessor[processors.size()]));
     }
